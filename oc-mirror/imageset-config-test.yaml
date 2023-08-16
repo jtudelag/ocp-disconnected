@@ -1,0 +1,34 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  local:
+    path: ./oc-mirror-metadata
+mirror:
+  #platform:
+  #  graph: true # Required for the OSUS ooperator
+  #  architectures:
+  #    - amd64
+  #  channels:
+  #  - name: stable-4.12
+  #    minVersion: '4.12.26'
+  #    maxVersion: '4.12.27'
+  #    type: ocp
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.12
+    packages:
+    # OADP Packages
+    - name: redhat-oadp-operator
+    # OCP Update Service
+    #- name: cincinnati-operator
+    # Cert Manager
+    #- name: openshift-cert-manager-operator
+    # Network Observability Operator
+    #- name: netobserv-operator
+ # - catalog: registry.redhat.io/redhat/community-operator-index:v4.12
+ #   packages:
+ #   # ESO
+ #   - name: external-secrets-operator
+  additionalImages:
+  # Generic tools
+  - name: registry.redhat.io/ubi9/ubi:latest
+  helm: {}
