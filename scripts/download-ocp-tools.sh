@@ -39,15 +39,6 @@ BINARY_FOLDER="/usr/local/bin"
 TMPDIR="$(mktemp -d -q)"
 TARGZ_FOLDER="$(mktemp -d -q)"
 
-# Not working as expected...
-# Download RPMs
-#echo "Downloading RPMs"
-#mkdir "$TARGZ_FOLDER/rpms"
-##sudo dnf download --resolve --alldeps --destdir "$TARGZ_FOLDER/rpms/" podman git jq ansible-navigator
-
-# Install Collections
-echo "Downloading OpenShift CLI binaries ;)"
-
 dl_openshift_install () {
   echo "Downloading openshift-install ;)"
   DEST_FOLDER=${1:-$BINARY_FOLDER}
@@ -119,7 +110,7 @@ dl_govc () {
 }
 
 dl_all () {
-  echo "Installing vSphere CLI ;)"
+  echo "Downloading OpenShift CLI binaries ;)"
   DEST_FOLDER=${1:-$BINARY_FOLDER}
   dl_openshift_install "$DEST_FOLDER"
   dl_oc "$DEST_FOLDER"
