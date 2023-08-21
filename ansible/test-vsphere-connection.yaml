@@ -1,0 +1,50 @@
+---
+- name: Create VMs in a vSphere
+  hosts: localhost
+  tasks:
+
+  - name: Build a list of all the datastores
+    vmware.vmware_rest.vcenter_datastore_info:
+    register: all_the_datastores
+
+  - name: Debug datastores
+    ansible.builtin.debug:
+      var: all_the_datastores
+
+  - name: Build a list of all the clusters
+    vmware.vmware_rest.vcenter_cluster_info:
+    register: all_the_clusters
+
+  - name: Debug clusters
+    ansible.builtin.debug:
+      var: all_the_clusters
+
+  - name: Build a list of all the DCs
+    vmware.vmware_rest.vcenter_datacenter_info:
+    register: all_the_dcs
+
+  - name: Debug DCs
+    ansible.builtin.debug:
+      var: all_the_dcs
+
+  - name: Build a list of all the Hosts
+    vmware.vmware_rest.vcenter_host_info:
+      #datacenters: SDDC-Datacenter
+      #clusters: Cluster-1
+    register: all_the_host
+
+  - name: Debug Hosts
+    ansible.builtin.debug:
+      var: all_the_host
+
+  - name: Build a list of all the Folders
+    vmware.vmware_rest.vcenter_folder_info:
+    register: all_the_folder
+
+  - name: Debug Fodlers
+    ansible.builtin.debug:
+      var: all_the_folder
+
+# Folder lookup is broken. Breaks randomly: https://github.com/ansible-collections/vmware.vmware_rest/issues/324
+#  - name: lookup MoID of the DC
+#    ansible.builtin.debug: msg="{{ lookup('vmware.vmware_rest.cluster_moid', '/SDDC-Datacenter/host/Cluster-1') }}"
