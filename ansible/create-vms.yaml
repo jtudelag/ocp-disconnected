@@ -1,0 +1,66 @@
+---
+- name: Create VMs in a vSphere
+  hosts: localhost
+  gather_facts: no
+  vars:
+    folder_name: sandbox-94h2z
+  tasks:
+
+  #Folder lookup is broken, using module info instead.
+  - name: Build a list of all the folders
+    vmware.vmware_rest.vcenter_folder_info:
+      filter_type: VIRTUAL_MACHINE
+      filter_names:
+        - "{{ folder_name}}"
+    register: my_folders
+
+  - name: Setting MOID vars
+    ansible.builtin.set_fact:
+      cluster_moid: "{{ lookup('vmware.vmware_rest.cluster_moid', '/SDDC-Datacenter/host/Cluster-1') }}"
+      datastore_moid: "{{ lookup('vmware.vmware_rest.datastore_moid', '/SDDC-Datacenter/datastore/WorkloadDatastore') }}"
+      folder_moid: "{{ my_folders.value[0].folder }}"
+      network_moid: "{{ lookup('vmware.vmware_rest.network_moid', '/SDDC-Datacenter/network/segment-sandbox-94h2z') }}"
+
+
+  - name: Debug Folder
+    ansible.builtin.debug:
+      var: folder_moid
+      verbosity: 2
+
+  - name: Create a VM
+    vmware.vmware_rest.vcenter_vm:
+      placement:
+        cluster: "{{ cluster_moid }}"
+        datastore: "{{ datastore_moid }}"
+        folder: "{{ folder_moid }}"
+        network: "{{ network_moid }}"
+      name: test_vm2
+      guest_OS: RHEL_8_64
+      hardware_version: VMX_15
+      cdroms:
+        - type: SATA
+          start_connected: true
+          sata:
+            bus: 0
+            unit: 2
+      memory:
+        hot_add_enabled: true
+        size_MiB: 1024
+      disks:
+        - type: SCSI
+          iscsi:
+            bus: 0
+            unit: 1
+          new_vmdk:
+            name: primary_disk
+            capacity: 40000000000
+      nics:
+      - mac_type: "MANUAL"
+        mac_address: "00:50:56:00:FF:11"
+        backing:
+          type: "DISTRIBUTED_PORTGROUP"
+          network: "{{ network_moid }}"
+      memory:
+          hot_add_enabled: true
+          size_MiB: 1024
+    register: my_vm 
