@@ -1,0 +1,9 @@
+collections:
+  - name: redhat.openshift
+    version: 2.3.0
+  #- name: vmware.vmware_rest
+  #  version: 2.3.1
+  # Installing community collection vmware_rest collection does no support Advanced Settings and Custom Parameters.
+  # https://github.com/ansible-collections/vmware.vmware_rest/issues/367
+  - name: community.vmware
+    version: 3.8.0
