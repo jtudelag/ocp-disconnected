@@ -4,63 +4,68 @@
   gather_facts: no
   vars:
     folder_name: sandbox-94h2z
+    folder_path: "/SDDC-Datacenter/vm/Workloads/sandbox-94h2z"
+    #cluster_path: "/SDDC-Datacenter/host/Cluster-1"
+    cluster_path: "Cluster-1"
+    datacenter_name: "SDDC-Datacenter"
+    network_name: segment-sandbox-94h2z
+    vm_name: jorge-test-community
   tasks:
 
-  #Folder lookup is broken, using module info instead.
-  - name: Build a list of all the folders
-    vmware.vmware_rest.vcenter_folder_info:
-      filter_type: VIRTUAL_MACHINE
-      filter_names:
-        - "{{ folder_name}}"
-    register: my_folders
+# Examples:
+# https://github.com/RedHatOfficial/ocp4-vsphere-upi-automation/blob/master/roles/vsphere_vm/tasks/static-iso.yml#L89
+# https://github.com/sa-ne/openshift4-vmware-upi/blob/514ca0174c840c8ad664d96cefe3f8fbb582d7db/roles/vmware/tasks/vms-cluster-placement.yaml#L6
+# This is not idempotent! It fails with error: 
+#   "op: reconfig" 
+#   "msg: A specified parameter was not correct: spec.cpuAllocation"
+  - name: Create a virtual machine 
+    community.vmware.vmware_guest:
+      folder: "{{ folder_path }}"
+      cluster: "{{ cluster_path }}"
+      datacenter: "{{ datacenter_name }}"
+      name: "{{ vm_name }}"
+      state: present
+      guest_id: rhel8_64Guest
+      advanced_settings:
+      - key: guestinfo.ignition.config.data.encoding
+        value: base64
+      - key: disk.EnableUUID
+        value: 'TRUE'
+      - key: stealclock.enable
+        value: 'TRUE'
+      - key: sched.cpu.latencySensitivity
+        value: 'High'
+      disk:
+      - size_gb: 50
+        type: thin
+        datastore: WorkloadDatastore
+      hardware:
+        memory_mb: 4096
+        memory_reservation_lock: true
+        hotadd_memory: false
+        num_cpus: 4
+        num_cpu_cores_per_socket: 2
+        cpu_reservation: 8
+        hotadd_cpu: false
+        hotremove_cpu: false
+        scsi: paravirtual
+        version: 15
+      cdrom:
+        - controller_number: 0
+          unit_number: 0
+          state: present
+      networks:
+      - name: "{{ network_name }}"
+        mac: "00:50:56:00:FF:11"
+    register: deploy_vm
 
-  - name: Setting MOID vars
-    ansible.builtin.set_fact:
-      cluster_moid: "{{ lookup('vmware.vmware_rest.cluster_moid', '/SDDC-Datacenter/host/Cluster-1') }}"
-      datastore_moid: "{{ lookup('vmware.vmware_rest.datastore_moid', '/SDDC-Datacenter/datastore/WorkloadDatastore') }}"
-      folder_moid: "{{ my_folders.value[0].folder }}"
-      network_moid: "{{ lookup('vmware.vmware_rest.network_moid', '/SDDC-Datacenter/network/segment-sandbox-94h2z') }}"
-
-
-  - name: Debug Folder
-    ansible.builtin.debug:
-      var: folder_moid
-      verbosity: 2
-
-  - name: Create a VM
-    vmware.vmware_rest.vcenter_vm:
-      placement:
-        cluster: "{{ cluster_moid }}"
-        datastore: "{{ datastore_moid }}"
-        folder: "{{ folder_moid }}"
-        network: "{{ network_moid }}"
-      name: test_vm2
-      guest_OS: RHEL_8_64
-      hardware_version: VMX_15
-      cdroms:
-        - type: SATA
-          start_connected: true
-          sata:
-            bus: 0
-            unit: 2
-      memory:
-        hot_add_enabled: true
-        size_MiB: 1024
-      disks:
-        - type: SCSI
-          iscsi:
-            bus: 0
-            unit: 1
-          new_vmdk:
-            name: primary_disk
-            capacity: 40000000000
-      nics:
-      - mac_type: "MANUAL"
-        mac_address: "00:50:56:00:FF:11"
-        backing:
-          type: "DISTRIBUTED_PORTGROUP"
-          network: "{{ network_moid }}"
-      memory:
-          hot_add_enabled: true
-          size_MiB: 1024
-    register: my_vm 
+# Adds TPM device
+# Does not work, because of the following error
+# "msg": "Failed to configure vTPM device on virtual machine due to '('A specified parameter was not correct: spec.cpuAllocation', None)'"
+#  - name: Add vTPM from specified VM
+#    community.vmware.vmware_guest_tpm:
+#      folder: "{{ folder_path }}"
+#      #cluster: "{{ cluster_path }}"
+#      datacenter: "{{ datacenter_name }}"
+#      name: "{{ vm_name }}"
+#      state: present
