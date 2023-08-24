@@ -9,7 +9,7 @@
     cluster_path: "Cluster-1"
     datacenter_name: "SDDC-Datacenter"
     network_name: segment-sandbox-94h2z
-    vm_name: jorge-test-community
+    vm_name: jorge-sno
   tasks:
 
 # Examples:
@@ -26,6 +26,7 @@
       name: "{{ vm_name }}"
       state: present
       guest_id: rhel8_64Guest
+      validate_certs: false
       advanced_settings:
       - key: guestinfo.ignition.config.data.encoding
         value: base64
@@ -56,7 +57,14 @@
           state: present
       networks:
       - name: "{{ network_name }}"
+        type: static
+        start_connected: true
         mac: "00:50:56:00:FF:11"
+        #ip: 192.168.171.100
+        #netmask: 255.255.255.0
+        #gateway: 192.168.171.1
+        #dns_servers:
+        #- 10.2.192.12
     register: deploy_vm
 
 # Adds TPM device
