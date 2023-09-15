@@ -20,7 +20,10 @@ server_list = ansible_automation_hub, galaxy
 [galaxy_server.ansible_automation_hub]
 url=https://console.redhat.com/api/automation-hub/content/published/
 auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
-token= '${TOKEN}'
+
+# Dont use quotes, single or double!!! 
+# Otherwise this wont work!!!!!!!
+token= ${TOKEN}
 
 [galaxy_server.galaxy]
 url=https://galaxy.ansible.com/
