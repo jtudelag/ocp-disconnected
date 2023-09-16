@@ -82,4 +82,6 @@ mirror:
   #- name: registry.redhat.io/openshift-gitops-1/must-gather-rhel8:v1.9.0
   # Ansible EE to run playbooks
   - name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:1.0.0
+  # Test OpenShift
+  - name: quay.io/openshifttest/hello-openshift:1.2.0
   helm: {}
