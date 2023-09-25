@@ -1,9 +1,11 @@
 #!/bin/bash
 
-#wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
-#sudo mv mkcert-v1.4.4-linux-amd64 /usr/local/bin/mkcert
-#sudo chmod +x /usr/local/bin/mkcert
-#sudo chown root:root /usr/local/bin/mkcert
+set -euxo pipefail
+
+curl -L https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64 -o mkcert
+sudo mv mkcert /usr/local/bin/mkcert
+sudo chmod +x /usr/local/bin/mkcert
+sudo chown root:root /usr/local/bin/mkcert
 
 mkdir -p ~/.registry/{lib,auth,certs}
 
