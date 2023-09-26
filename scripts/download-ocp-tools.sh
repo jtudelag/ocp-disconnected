@@ -16,12 +16,12 @@ set -euo pipefail
 # OCP graph: https://ctron.github.io/openshift-update-graph/#stable-4.12
 OCP_MAJOR=4
 OCP_MINOR=12
-OCP_PATCH=28
+OCP_PATCH=32
 OCP_XY="${OCP_MAJOR}.${OCP_MINOR}"
 OCP_XYZ="${OCP_XY}.${OCP_PATCH}"
 GOVC_VERSION="v0.30.7"
 
-OCP_MIRROR_URL="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-${OCP_XY}"
+OCP_MIRROR_URL="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_XYZ}"
 
 CLI_INSTALL_FILE="openshift-install-linux.tar.gz"
 CLI_OC_FILE="openshift-client-linux.tar.gz"
