@@ -6,7 +6,8 @@
 ## VARS ##
 IFACE="em3"
 
-URLS_TO_BLOCK="registry.redhat.io
+URLS_TO_BLOCK="
+registry.redhat.io
 access.redhat.com
 quay.io
 cdn.quay.io
