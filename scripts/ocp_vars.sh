@@ -13,3 +13,5 @@ DNS_IP="192.168.94.10"
 #####
 PULL_SECRET_FILE="/home/lab-user/pull-secret.txt"
 ANSIBLE_AUTOMATION_HUB_TOKEN_FILE="/home/lab-user/ansible-token.txt"
+
+REGISTRY_FOLDER="/var/registry"
