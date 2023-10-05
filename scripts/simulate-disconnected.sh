@@ -7,6 +7,7 @@
 IFACE="em3"
 
 URLS_TO_BLOCK="
+rhcos.mirror.openshift.com
 registry.redhat.io
 access.redhat.com
 quay.io
@@ -39,6 +40,8 @@ function valid_ip()
     return $stat
 }
 
+#------------------- BLOCK-------------------#
+
 function block_ip(){
   IP="$1"
   firewall-cmd --direct --add-rule ipv4 filter OUTPUT 1 -o "${IFACE}" -d "${IP}/32" -j REJECT
@@ -61,11 +64,48 @@ function block_url(){
 
 }
 
-## MAIN 
-for url in $URLS_TO_BLOCK
-do
-  block_url "$url"
-done
+function block_all(){
+  for url in $URLS_TO_BLOCK
+  do
+    block_url "$url"
+  done
+}
+
+#------------------- UNBLOCK-------------------#
+
+function unblock_ip(){
+  IP="$1"
+  firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 1 -o "${IFACE}" -d "${IP}/32" -j REJECT
+}
+
+function unblock_url(){
+  URL="$1"
+  DNS_RESOLUTION=$(dig +short "$URL")
+
+  for i in $DNS_RESOLUTION
+  do
+
+   ip="$i"
+   if valid_ip $ip
+   then
+     unblock_ip "$ip"
+   fi
+
+  done;
+
+}
+
+function unblock_all(){
+  for url in $URLS_TO_BLOCK
+  do
+    unblock_url "$url"
+  done
+}
+
+#------------------------- Main------------------#
+
+#block_all
+unblock_all
 
 #Show rules
 firewall-cmd --direct --get-rules ipv4 filter OUTPUT
